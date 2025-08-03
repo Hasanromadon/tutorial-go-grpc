@@ -29,12 +29,7 @@ const (
 // UserServiceClient is the client API for UserService service.
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
-//
-// Definisi service bernama UserService
-// Service ini akan memiliki fungsi RPC yang bisa dipanggil oleh client
 type UserServiceClient interface {
-	// Mendeklarasikan sebuah fungsi RPC bernama GetUser
-	// Fungsi ini menerima `UserRequest` dan mengembalikan `UserResponse`
 	GetUser(ctx context.Context, in *UserRequest, opts ...grpc.CallOption) (*UserResponse, error)
 }
 
@@ -59,12 +54,7 @@ func (c *userServiceClient) GetUser(ctx context.Context, in *UserRequest, opts .
 // UserServiceServer is the server API for UserService service.
 // All implementations must embed UnimplementedUserServiceServer
 // for forward compatibility.
-//
-// Definisi service bernama UserService
-// Service ini akan memiliki fungsi RPC yang bisa dipanggil oleh client
 type UserServiceServer interface {
-	// Mendeklarasikan sebuah fungsi RPC bernama GetUser
-	// Fungsi ini menerima `UserRequest` dan mengembalikan `UserResponse`
 	GetUser(context.Context, *UserRequest) (*UserResponse, error)
 	mustEmbedUnimplementedUserServiceServer()
 }

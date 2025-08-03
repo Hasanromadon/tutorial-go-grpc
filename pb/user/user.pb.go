@@ -25,12 +25,9 @@ const (
 	_ = protoimpl.EnforceVersion(protoimpl.MaxVersion - 20)
 )
 
-// Struktur data request yang dikirim oleh client
 type UserRequest struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
-	// Field bernama 'id' dengan tipe int32 (angka bilangan bulat)
-	// Angka 1 adalah penanda urutan field, bukan default value
-	Id            int32 `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Id            int32                  `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -72,13 +69,10 @@ func (x *UserRequest) GetId() int32 {
 	return 0
 }
 
-// Struktur data response yang dikembalikan oleh server
 type UserResponse struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
-	// Field pertama berupa string untuk nama user
-	Name string `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
-	// Field kedua berupa int32 untuk umur user
-	Age           int32 `protobuf:"varint,2,opt,name=age,proto3" json:"age,omitempty"`
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Name          string                 `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
+	Age           int32                  `protobuf:"varint,2,opt,name=age,proto3" json:"age,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }

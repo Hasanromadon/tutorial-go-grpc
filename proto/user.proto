@@ -9,26 +9,17 @@ package user;
 
 option go_package = "pb/user;userpb";
 
-// Definisi service bernama UserService
-// Service ini akan memiliki fungsi RPC yang bisa dipanggil oleh client
+
 service UserService {
-  // Mendeklarasikan sebuah fungsi RPC bernama GetUser
-  // Fungsi ini menerima `UserRequest` dan mengembalikan `UserResponse`
-  rpc GetUser (UserRequest) returns (UserResponse);
+  rpc GetUser(UserRequest) returns (UserResponse);
 }
 
-// Struktur data request yang dikirim oleh client
 message UserRequest {
-  // Field bernama 'id' dengan tipe int32 (angka bilangan bulat)
-  // Angka 1 adalah penanda urutan field, bukan default value
   int32 id = 1;
 }
 
-// Struktur data response yang dikembalikan oleh server
 message UserResponse {
-  // Field pertama berupa string untuk nama user
   string name = 1;
-
-  // Field kedua berupa int32 untuk umur user
   int32 age = 2;
 }
+

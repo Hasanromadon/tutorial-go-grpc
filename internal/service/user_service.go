@@ -7,6 +7,7 @@ type User struct {
 
 type UserService interface {
 	GetUserByID(id int32) *User
+	GetAllUsers() []*User // << new
 }
 
 type userServiceImpl struct{}
@@ -20,4 +21,12 @@ func (s *userServiceImpl) GetUserByID(id int32) *User {
 		return &User{Name: "Andi", Age: 25}
 	}
 	return &User{Name: "Tidak Dikenal", Age: 0}
+}
+
+func (s *userServiceImpl) GetAllUsers() []*User {
+	return []*User{
+		{Name: "Andi", Age: 25},
+		{Name: "Budi", Age: 30},
+		{Name: "Citra", Age: 28},
+	}
 }

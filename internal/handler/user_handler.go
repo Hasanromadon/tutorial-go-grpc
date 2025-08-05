@@ -2,8 +2,10 @@ package handler
 
 import (
 	"context"
+	"fmt"
 	"go-grpc/internal/service"
 	pb "go-grpc/pb/user"
+	"io"
 )
 
 type UserHandler struct {
@@ -37,4 +39,27 @@ func (h *UserHandler) GetUser(ctx context.Context, req *pb.UserRequest) (*pb.Use
 		Name: user.Name,
 		Age:  user.Age,
 	}, nil
+}
+
+func (h *UserHandler) UploadUsers(stream pb.UserService_UploadUsersServer) error {
+	var users []*service.User
+
+	for {
+		req, err := stream.Recv()
+		if err == io.EOF {
+			count := h.UserService.UploadUsers(users)
+			return stream.SendAndClose(&pb.UploadUserResponse{
+				SuccessCount: count,
+				Message:      fmt.Sprintf("%d users uploaded successfully", count),
+			})
+		}
+		if err != nil {
+			return err
+		}
+
+		users = append(users, &service.User{
+			Name: req.GetName(),
+			Age:  req.GetAge(),
+		})
+	}
 }

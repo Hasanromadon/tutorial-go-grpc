@@ -23,8 +23,9 @@ import (
 const _ = grpc.SupportPackageIsVersion9
 
 const (
-	UserService_GetUser_FullMethodName   = "/user.UserService/GetUser"
-	UserService_ListUsers_FullMethodName = "/user.UserService/ListUsers"
+	UserService_GetUser_FullMethodName     = "/user.UserService/GetUser"
+	UserService_ListUsers_FullMethodName   = "/user.UserService/ListUsers"
+	UserService_UploadUsers_FullMethodName = "/user.UserService/UploadUsers"
 )
 
 // UserServiceClient is the client API for UserService service.
@@ -33,6 +34,7 @@ const (
 type UserServiceClient interface {
 	GetUser(ctx context.Context, in *UserRequest, opts ...grpc.CallOption) (*UserResponse, error)
 	ListUsers(ctx context.Context, in *Empty, opts ...grpc.CallOption) (grpc.ServerStreamingClient[UserResponse], error)
+	UploadUsers(ctx context.Context, opts ...grpc.CallOption) (grpc.ClientStreamingClient[UserRequest, UploadUserResponse], error)
 }
 
 type userServiceClient struct {
@@ -72,12 +74,26 @@ func (c *userServiceClient) ListUsers(ctx context.Context, in *Empty, opts ...gr
 // This type alias is provided for backwards compatibility with existing code that references the prior non-generic stream type by name.
 type UserService_ListUsersClient = grpc.ServerStreamingClient[UserResponse]
 
+func (c *userServiceClient) UploadUsers(ctx context.Context, opts ...grpc.CallOption) (grpc.ClientStreamingClient[UserRequest, UploadUserResponse], error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	stream, err := c.cc.NewStream(ctx, &UserService_ServiceDesc.Streams[1], UserService_UploadUsers_FullMethodName, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	x := &grpc.GenericClientStream[UserRequest, UploadUserResponse]{ClientStream: stream}
+	return x, nil
+}
+
+// This type alias is provided for backwards compatibility with existing code that references the prior non-generic stream type by name.
+type UserService_UploadUsersClient = grpc.ClientStreamingClient[UserRequest, UploadUserResponse]
+
 // UserServiceServer is the server API for UserService service.
 // All implementations must embed UnimplementedUserServiceServer
 // for forward compatibility.
 type UserServiceServer interface {
 	GetUser(context.Context, *UserRequest) (*UserResponse, error)
 	ListUsers(*Empty, grpc.ServerStreamingServer[UserResponse]) error
+	UploadUsers(grpc.ClientStreamingServer[UserRequest, UploadUserResponse]) error
 	mustEmbedUnimplementedUserServiceServer()
 }
 
@@ -93,6 +109,9 @@ func (UnimplementedUserServiceServer) GetUser(context.Context, *UserRequest) (*U
 }
 func (UnimplementedUserServiceServer) ListUsers(*Empty, grpc.ServerStreamingServer[UserResponse]) error {
 	return status.Errorf(codes.Unimplemented, "method ListUsers not implemented")
+}
+func (UnimplementedUserServiceServer) UploadUsers(grpc.ClientStreamingServer[UserRequest, UploadUserResponse]) error {
+	return status.Errorf(codes.Unimplemented, "method UploadUsers not implemented")
 }
 func (UnimplementedUserServiceServer) mustEmbedUnimplementedUserServiceServer() {}
 func (UnimplementedUserServiceServer) testEmbeddedByValue()                     {}
@@ -144,6 +163,13 @@ func _UserService_ListUsers_Handler(srv interface{}, stream grpc.ServerStream) e
 // This type alias is provided for backwards compatibility with existing code that references the prior non-generic stream type by name.
 type UserService_ListUsersServer = grpc.ServerStreamingServer[UserResponse]
 
+func _UserService_UploadUsers_Handler(srv interface{}, stream grpc.ServerStream) error {
+	return srv.(UserServiceServer).UploadUsers(&grpc.GenericServerStream[UserRequest, UploadUserResponse]{ServerStream: stream})
+}
+
+// This type alias is provided for backwards compatibility with existing code that references the prior non-generic stream type by name.
+type UserService_UploadUsersServer = grpc.ClientStreamingServer[UserRequest, UploadUserResponse]
+
 // UserService_ServiceDesc is the grpc.ServiceDesc for UserService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -161,6 +187,11 @@ var UserService_ServiceDesc = grpc.ServiceDesc{
 			StreamName:    "ListUsers",
 			Handler:       _UserService_ListUsers_Handler,
 			ServerStreams: true,
+		},
+		{
+			StreamName:    "UploadUsers",
+			Handler:       _UserService_UploadUsers_Handler,
+			ClientStreams: true,
 		},
 	},
 	Metadata: "user.proto",

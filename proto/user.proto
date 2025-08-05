@@ -12,16 +12,24 @@ option go_package = "pb/user;userpb";
 
 service UserService {
   rpc GetUser(UserRequest) returns (UserResponse);
-   rpc ListUsers(Empty) returns (stream UserResponse); // << new
+  rpc ListUsers(Empty) returns (stream UserResponse); 
+  rpc UploadUsers(stream UserRequest) returns (UploadUserResponse); // << new
 }
 
 message UserRequest {
   int32 id = 1;
+  string name = 2; //<new 
+  int32 age = 3; //<new
 }
 
 message UserResponse {
   string name = 1;
   int32 age = 2;
+}
+
+message UploadUserResponse { //<new
+  int32 successCount = 1;
+  string message = 2;
 }
 
 message Empty {} // << Tambahkan untuk request kosong

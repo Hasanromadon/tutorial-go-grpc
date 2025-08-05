@@ -1,5 +1,7 @@
 package service
 
+import "fmt"
+
 type User struct {
 	Name string
 	Age  int32
@@ -7,7 +9,8 @@ type User struct {
 
 type UserService interface {
 	GetUserByID(id int32) *User
-	GetAllUsers() []*User // << new
+	GetAllUsers() []*User
+	UploadUsers(users []*User) int32 // << new
 }
 
 type userServiceImpl struct{}
@@ -29,4 +32,12 @@ func (s *userServiceImpl) GetAllUsers() []*User {
 		{Name: "Budi", Age: 30},
 		{Name: "Citra", Age: 28},
 	}
+}
+
+func (s *userServiceImpl) UploadUsers(users []*User) int32 {
+	fmt.Printf("📥 Uploading %d users\n", len(users))
+	for _, u := range users {
+		fmt.Printf("✅ %s (%d tahun)\n", u.Name, u.Age)
+	}
+	return int32(len(users)) // hitung berapa yang berhasil
 }

@@ -8,6 +8,9 @@ import (
 	"io"
 	"log"
 	"time"
+
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
 )
 
 type UserHandler struct {
@@ -36,10 +39,17 @@ func (h *UserHandler) ListUsers(_ *pb.Empty, stream pb.UserService_ListUsersServ
 }
 
 func (h *UserHandler) GetUser(ctx context.Context, req *pb.UserRequest) (*pb.UserResponse, error) {
-	user := h.UserService.GetUserByID(req.GetId())
+	select {
+	case <-time.After(3 * time.Second): // simulasi proses lambat
+		log.Println("✅ Proses selesai")
+	case <-ctx.Done():
+		log.Println("❌ Dibatalkan:", ctx.Err())
+		return nil, status.Error(codes.Canceled, "request canceled by client")
+	}
+
 	return &pb.UserResponse{
-		Name: user.Name,
-		Age:  user.Age,
+		Name: req.Name,
+		Age:  req.Age,
 	}, nil
 }
 

@@ -82,6 +82,22 @@ func startChat(client user.UserServiceClient) {
 	<-done
 }
 
+func callWithTimeout(client user.UserServiceClient) {
+	ctx, cancel := context.WithTimeout(context.Background(), 2*time.Second)
+	defer cancel()
+
+	res, err := client.GetUser(ctx, &user.UserRequest{
+		Id:   1,
+		Name: "Hasan",
+		Age:  22,
+	})
+	if err != nil {
+		log.Fatalf("❌ Error: %v", err)
+	}
+
+	fmt.Println("✅ Response:", res)
+}
+
 func main() {
 	conn, err := grpc.Dial("localhost:50051", grpc.WithInsecure())
 	if err != nil {
@@ -120,4 +136,6 @@ func main() {
 
 	// Bidirectional streaming
 	startChat(client)
+
+	callWithTimeout(client)
 }

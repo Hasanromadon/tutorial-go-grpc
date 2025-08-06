@@ -9,43 +9,54 @@ import (
 	"net"
 	"time"
 
+	"go.uber.org/zap"
 	"google.golang.org/grpc"
 )
 
-func unaryLoggerInterceptor(
+var logger *zap.Logger
+
+func init() {
+	var err error
+	logger, err = zap.NewProduction() // atau zap.NewDevelopment() untuk log berwarna
+	if err != nil {
+		log.Fatalf("cannot init zap: %v", err)
+	}
+}
+
+func unaryZapInterceptor(
 	ctx context.Context,
 	req interface{},
 	info *grpc.UnaryServerInfo,
 	handler grpc.UnaryHandler,
 ) (interface{}, error) {
 	start := time.Now()
-
-	// Proses request ke handler RPC
 	res, err := handler(ctx, req)
 
-	duration := time.Since(start)
-
-	log.Printf("📝 Unary: %s | duration: %v | error: %v",
-		info.FullMethod, duration, err)
+	logger.Info("Unary gRPC Request",
+		zap.String("method", info.FullMethod),
+		zap.Duration("duration", time.Since(start)),
+		zap.Bool("error", err != nil),
+		zap.Error(err),
+	)
 
 	return res, err
 }
 
-func streamLoggerInterceptor(
+func streamZapInterceptor(
 	srv interface{},
 	ss grpc.ServerStream,
 	info *grpc.StreamServerInfo,
 	handler grpc.StreamHandler,
 ) error {
 	start := time.Now()
-
-	// Proses stream ke handler
 	err := handler(srv, ss)
 
-	duration := time.Since(start)
-
-	log.Printf("📡 Stream: %s | duration: %v | error: %v",
-		info.FullMethod, duration, err)
+	logger.Info("Stream gRPC Request",
+		zap.String("method", info.FullMethod),
+		zap.Duration("duration", time.Since(start)),
+		zap.Bool("error", err != nil),
+		zap.Error(err),
+	)
 
 	return err
 }
@@ -57,8 +68,8 @@ func main() {
 	}
 
 	grpcServer := grpc.NewServer(
-		grpc.UnaryInterceptor(unaryLoggerInterceptor),
-		grpc.StreamInterceptor(streamLoggerInterceptor),
+		grpc.UnaryInterceptor(unaryZapInterceptor),
+		grpc.StreamInterceptor(streamZapInterceptor),
 	)
 
 	userService := service.NewUserService()
